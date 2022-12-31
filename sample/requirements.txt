@@ -1,0 +1,2 @@
+prefect==2.7.5
+prefect_docker==0.1.0

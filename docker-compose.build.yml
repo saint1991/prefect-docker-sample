@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+
+  task1:
+    image: prefect-sample/task1
+    build: tasks/task1
+
+
+  task2:
+    image: prefect-sample/task2
+    build: tasks/task2
+
+  task3: 
+    image: prefect-sample/task3
+    build: tasks/task3

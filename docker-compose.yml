@@ -1,0 +1,53 @@
+version: '3.9'
+
+volumes:
+  prefect-storage:
+
+services:
+  
+  orion:
+    image: prefecthq/prefect:2.7-python3.10
+    restart: on-failure
+    entrypoint:
+      - prefect
+      - orion
+      - start
+    environment:
+      PREFECT_ORION_API_HOST: 0.0.0.0
+      PREFECT_ORION_UI_API_URL: http://127.0.0.1:4200/api
+    ports:
+      - 4200:4200
+    
+  agent:
+    depends_on:
+      - orion
+    build:
+      context: sample
+      target: runtime
+    restart: on-failure
+    command:
+      - agent
+      - start
+      - --work-queue=test
+    volumes:
+      - prefect-storage:/storage
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WORK_QUEUE: test
+      STORAGE_PATH: /storage
+      PREFECT_API_URL: http://orion:4200/api
+
+  deployment:
+    depends_on:
+      - orion
+    restart: on-failure
+    build:
+      context: sample
+      target: deployment
+    environment:
+      STORAGE_NAME: sample
+      STORAGE_PATH: /storage
+      WORK_QUEUE: test
+      PREFECT_API_URL: http://orion:4200/api
+    volumes:
+      - prefect-storage:/storage
